@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Cart</title>
+</head>
+<body>
+    <h1>Cart</h1>
+    <table id="cart-table">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Discount</th>
+                <th>Price After Discount</th>
+                <th>Quantity</th>
+                <th>Specify</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <h2>Total: <span id="total"></span></h2>
+    <button id="checkout-button">Checkout</button>
+
+    <script>
+        async function fetchCart(username) {
+            const response = await fetch(`http://127.0.0.1:8000/Users/${username}/cart`);
+            const cart = await response.json();
+            return cart;
+        }
+
+        function createCartItemRow(cartItemId, cartItem) {
+            const tr = document.createElement("tr");
+
+            const imgCell = document.createElement("td");
+            const img = document.createElement("img");
+            img.src = "https://f4.bcbits.com/img/a3005217838_10.jpg";
+            img.width = 50;
+            img.height = 50;
+            imgCell.appendChild(img);
+            tr.appendChild(imgCell);
+
+            const idCell = document.createElement("td");
+            idCell.innerText = cartItemId;
+            tr.appendChild(idCell);
+
+            const nameCell = document.createElement("td");
+            nameCell.innerText = cartItem.product_name;
+            tr.appendChild(nameCell);
+
+            const priceCell = document.createElement("td");
+            priceCell.innerText = cartItem.product_price;
+            tr.appendChild(priceCell);
+
+            const discountCell = document.createElement("td");
+            discountCell.innerText = cartItem.discount;
+            tr.appendChild(discountCell);
+
+            const priceAfterDiscountCell = document.createElement("td");
+            priceAfterDiscountCell.innerText = cartItem.price_after_discount;
+            tr.appendChild(priceAfterDiscountCell);
+
+            const quantityCell = document.createElement("td");
+            quantityCell.innerText = cartItem.quantity;
+            tr.appendChild(quantityCell);
+
+            const specifyCell = document.createElement("td");
+            specifyCell.innerText = cartItem.specify;
+            tr.appendChild(specifyCell);
+
+            return tr;
+        }
+
+        async function init() {
+            const cartData = await fetchCart("user");
+            const tableBody = document.getElementById("cart-table").getElementsByTagName("tbody")[0];
+
+            for (const cartItemId in cartData.available_item) {
+                const cartItem = cartData.available_item[cartItemId];
+                const cartItemRow = createCartItemRow(cartItemId, cartItem);
+                tableBody.appendChild(cartItemRow);
+            }
+
+            document.getElementById("total").innerText = cartData.total;
+
+            document.getElementById("checkout-button").addEventListener("click", async () => {
+                const addressIndex = 0; // You can change this to the desired address index
+                const username = "user";
+                const response = await fetch(`http://127.0.0.1:8000/cart/checkout`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({username: username, address_index: addressIndex})
+                });
+                const result = await response.text();
+                console.log(result);
+                if (result != "KO") {
+                    alert
+					const newOrderId = result
+                    alert(`Checkout successful! Your order ID is: ${newOrderId}`);
+                } else {
+                    alert("Checkout failed.");
+                }
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

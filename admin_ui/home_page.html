@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #ffb3a6;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #ff857f;
+        }
+
+        #logout {
+            background-color: #f44336;
+        }
+
+        #logout:hover {
+            background-color: #e53935;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Admin Panel</h1>
+    <button onclick="location.href='add_product.html'">Add Product</button>
+    <button onclick="location.href='browse_products.html'">Browse Products</button>
+    <button onclick="location.href='modify_product.html'">Modify Product</button>
+    <button onclick="location.href='add_promotion.html'">Add Promotion</button>
+    <button onclick="location.href='browse_promotions.html'">Browse Promotions</button>
+    <br><br>
+    <button id="logout" onclick="location.href='login.html'">Logout</button>
+</body>
+</html>

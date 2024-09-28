@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Promotion</title>
+</head>
+<body>
+    <h1>Add Promotion</h1>
+    <form id="add-promotion-form">
+        <label for="product-ids">Product IDs (comma separated):</label>
+        <input type="text" id="product-ids" name="product_ids"><br><br>
+
+        <label>Start Date:</label>
+        <input type="number" id="start-year" name="start_year" placeholder="YYYY" min="1900" max="9999" step="1">
+        <input type="number" id="start-month" name="start_month" placeholder="MM" min="1" max="12" step="1">
+        <input type="number" id="start-day" name="start_day" placeholder="DD" min="1" max="31" step="1"><br><br>
+
+        <label>End Date:</label>
+        <input type="number" id="end-year" name="end_year" placeholder="YYYY" min="1900" max="9999" step="1">
+        <input type="number" id="end-month" name="end_month" placeholder="MM" min="1" max="12" step="1">
+        <input type="number" id="end-day" name="end_day" placeholder="DD" min="1" max="31" step="1"><br><br>
+
+        <label for="discount">Discount (in %):</label>
+        <input type="number" id="discount" name="discount" min="0" max="100" step="1"><br><br>
+
+        <button type="submit">Add Promotion</button>
+    </form>
+
+    <script>
+        document.getElementById("add-promotion-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const data = {
+                product_ids: document.getElementById("product-ids").value,
+                year_start: document.getElementById("start-year").value,
+                month_start: document.getElementById("start-month").value,
+                day_start: document.getElementById("start-day").value,
+                year_end: document.getElementById("end-year").value,
+                month_end: document.getElementById("end-month").value,
+                day_end: document.getElementById("end-day").value,
+                discount: document.getElementById("discount").value
+            };
+
+            const response = await fetch("http://127.0.0.1:8000/admin/add_promotion", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.text();
+			console.log(result);
+            alert(result);
+        });
+    </script>
+</body>
+</html>

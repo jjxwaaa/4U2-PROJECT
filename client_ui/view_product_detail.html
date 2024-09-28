@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Product Detail</title>
+    <style>
+        /* Add your custom styles here */
+    </style>
+</head>
+<body>
+    <h1>View Product Detail</h1>
+    <div id="product-detail">
+        <img src="https://f4.bcbits.com/img/a3005217838_10.jpg" alt="Product Image">
+        <div>
+            <p><strong>Name:</strong> <span id="name"></span></p>
+            <p><strong>Price:</strong> <span id="price"></span></p>
+            <p><strong>Description:</strong> <span id="description"></span></p>
+            <p><strong>Detail:</strong> <span id="detail"></span></p>
+            <p><strong>Type:</strong> <span id="type"></span></p>
+            <p><strong>Stock:</strong> <span id="stock"></span></p>
+            <p><strong>Specify:</strong> <select id="specify"></select></p>
+        </div>
+    </div>
+    <div>
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="1" value="1">
+    </div>
+    <button id="add-to-cart">Add to Cart</button>
+    <button id="add-to-favorite">Add to Favorite</button>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get("id");
+        const username = "user"; // Replace this with the actual username of the logged-in user
+
+        async function fetchProductById(id) {
+            const response = await fetch(`http://127.0.0.1:8000/Products/${id}`);
+            const product = await response.json();
+            return product;
+        }
+
+        function setProductDetail(product) {
+            document.getElementById("name").textContent = product.name;
+            document.getElementById("price").textContent = product.price;
+            document.getElementById("description").textContent = product.description;
+            document.getElementById("detail").textContent = product.detail;
+            document.getElementById("type").textContent = product.type.join(", ");
+            document.getElementById("stock").textContent = product.stock;
+
+            const specifySelect = document.getElementById("specify");
+            for (const key in product.specify) {
+                const option = document.createElement("option");
+                option.value = key;
+                option.textContent = key;
+                specifySelect.appendChild(option);
+            }
+        }
+
+        async function addToCart(username, productId, quantity) {
+            const response = await fetch(`http://127.0.0.1:8000/Products/${productId}/add_to_cart?username=${username}&quantity=${quantity}`);
+            const result = await response.text();
+            return result;
+        }
+
+        async function addToFavorite(username, productId) {
+            const response = await fetch(`http://127.0.0.1:8000/Products/${productId}/add_to_fav?username=${username}`);
+            const result = await response.text();
+            return result;
+        }
+
+        document.getElementById("add-to-cart").addEventListener("click", async () => {
+            const quantity = document.getElementById("quantity").value;
+            const result = await addToCart(username, productId, quantity);
+            if (result !== "KO") {
+                alert("Product added to cart successfully.");
+			} else {
+			alert("Failed to add product to cart.");
+			}
+			});
+			document.getElementById("add-to-favorite").addEventListener("click", async () => {
+        const result = await addToFavorite(username, productId);
+        if (result !== "KO") {
+            alert("Product added to favorites successfully.");
+        } else {
+            alert("Failed to add product to favorites.");
+        }
+    });
+
+    async function init() {
+        const product = await fetchProductById(productId);
+        setProductDetail(product);
+    }
+
+    init();
+</script>
+</body>
+</html>
+
+

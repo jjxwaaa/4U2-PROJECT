@@ -1,0 +1,12 @@
+required module (pip install)
+	- pip3 install fastapi
+	- pip3 install rich
+	- pip3 install uvicorn
+
+after instll all of these, Run the api using ```uvicorn main:app --reload```
+
+testing 
+
+ - client side 	-> register client_ui/register.html
+				-> in case for testing main system (using username:"user", password:"pass") in login page (client_ui/register.html)
+ - admin side	-> open admin_ui/index.html (using username:admin, password:"pass1")

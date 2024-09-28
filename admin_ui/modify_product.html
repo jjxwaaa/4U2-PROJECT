@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modify Product</title>
+</head>
+<body>
+    <h1>Modify Product</h1>
+    <form id="modify-product-form">
+        <label for="id">ID:</label>
+        <input type="text" id="id" name="id"><br><br>
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name"><br><br>
+
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price"><br><br>
+
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description"><br><br>
+
+        <label for="detail">Detail:</label>
+        <textarea id="detail" name="detail"></textarea><br><br>
+
+        <label for="type">Type:</label>
+        <input type="text" id="type" name="type"><br><br>
+
+        <label for="stock">Stock:</label>
+        <input type="number" id="stock" name="stock"><br><br>
+
+        <label for="specify">Specify:</label>
+        <input type="text" id="specify" name="specify"><br><br>
+
+        <button type="submit">Update Product</button>
+    </form>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        async function fetchProductById(id) {
+            const response = await fetch(`http://127.0.0.1:8000/Products?id=${id}`);
+            const data = await response.json();
+            return data[0];
+        }
+
+        async function updateProduct(product) {
+            const response = await fetch(`http://127.0.0.1:8000/admin/modify_product/${product.id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(product)
+            });
+            const result = await response.text();
+            if (result != "KO")
+                return (true);
+            return (false);
+        }
+
+        function setFormValues(product) {
+            document.getElementById("id").value = product.id;
+            document.getElementById("name").value = product.name;
+            document.getElementById("price").value = product.price;
+            document.getElementById("description").value = product.description;
+            document.getElementById("detail").value = product.detail;
+            document.getElementById("type").value = product.type.join(', ');
+            document.getElementById("stock").value = product.stock;
+            document.getElementById("specify").value = product.specify;
+        }
+
+        document.getElementById("modify-product-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const updatedProduct = {
+                id: document.getElementById("id").value,
+                product_name: document.getElementById("name").value,
+                product_price: document.getElementById("price").value,
+                product_description: document.getElementById("description").value,
+                product_detail: document.getElementById("detail").value,
+                product_type: document.getElementById("type").value.split(',').map(t => t.trim()),
+                product_stock: document.getElementById("stock").value,
+                product_specify: document.getElementById("specify").value
+            };
+
+            const isUpdated = await updateProduct(updatedProduct);
+            if (isUpdated) {
+                window.location.href = "browse_products.html";
+            } else {
+                alert("Failed to update the product.");
+            }
+        });
+
+        async function init() {
+            const product = await fetchProductById(productId);
+            setFormValues(product);
+        }
+
+        init();
+    </script>
+</body>
+</html>
+

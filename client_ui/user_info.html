@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Info</h1>
+    <button id="view-user-details">View User Details</button>
+    <div id="user-details" style="display: none;">
+        <h2>User Details</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <td id="user-id"></td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td id="user-name"></td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td id="user-status"></td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td id="user-email"></td>
+            </tr>
+            <tr>
+                <th>Password</th>
+                <td id="user-password"></td>
+            </tr>
+        </table>
+        <h3>Addresses</h3>
+        <ul id="user-addresses"></ul>
+        <label for="address-index">Address index:</label>
+        <input type="number" id="address-index" required>
+        <button id="delete-address-button">Delete Address</button>
+        <h3>Favorite Products</h3>
+        <div id="user-favorites"></div>
+        <h3>Order History</h3>
+        <div id="user-orders"></div>
+    </div>
+
+    <script>
+        async function fetchUserDetails(username) {
+            const response = await fetch(`http://127.0.0.1:8000/Users/${username}`);
+            const result = await response.json();
+
+            if (result !== "KO") {
+                document.getElementById("user-id").innerText = result.user_id;
+                document.getElementById("user-name").innerText = result.user_name;
+                document.getElementById("user-status").innerText = result.user_status;
+                document.getElementById("user-email").innerText = result.user_account.email;
+                document.getElementById("user-password").innerText = result.user_account.password;
+
+                const addresses = result.user_address;
+                const addressesList = document.getElementById("user-addresses");
+                addressesList.innerHTML = '';
+
+                for (const address of addresses) {
+                    const li = document.createElement("li");
+                    li.innerText = `${address.name}, ${address.address}, ${address.tel}`;
+                    addressesList.appendChild(li);
+                }
+
+                const favorites = result.user_favorite;
+                const favoritesDiv = document.getElementById("user-favorites");
+                favoritesDiv.innerHTML = '';
+
+                for (const favorite of favorites) {
+                    const productDiv = document.createElement("div");
+                    productDiv.innerHTML = `
+                        <h4>${favorite.name}</h4>
+                        <p>ID: ${favorite.id}</p>
+                        <p>Price: ${favorite.price}</p>
+                        <p>Description: ${favorite.description}</p>
+                        <p>Detail: ${favorite.detail}</p>
+                        <p>Type: ${favorite.type.join(", ")}</p>
+                        <p>Stock: ${favorite.stock}</p>
+                        <p>Specify: ${favorite.specify}</p>
+                    `;
+                    favoritesDiv.appendChild(productDiv);
+                }
+
+                // Fetch and display order history
+                const ordersResponse = await fetch(`http://127.0.0.1:8000/Users/${username}/orders`);
+                const orders = await ordersResponse.json();
+                const ordersDiv = document.getElementById("user-orders");
+                ordersDiv.innerHTML = '';
+                for (const order of orders) {
+                    // console.dir(order)
+                    const orderDiv = document.createElement("div");
+                    orderDiv.innerHTML = `
+                    <h4>Order ID: ${order.id}</h4>
+                    <p>Order Date: ${order.create}</p>
+                    <p>Order Status: ${order.payment_status}</p>
+                    <p>Order Amount: ${order.total}</p>
+                    `;
+                    console.log(":D")
+                    ordersDiv.appendChild(orderDiv);
+                    for (const item of order.items) {
+                        console.dir(item)
+                        const itemDiv = document.createElement("p");
+                        itemDiv.innerHTML = `
+                            ${item.product_name}
+                        `
+                        orderDiv.appendChild(itemDiv)
+                    }
+                }
+
+                document.getElementById("user-details").style.display = "block";
+            } else {
+                alert("Failed to fetch user details.");
+            }
+        }
+        document.getElementById("view-user-details").addEventListener("click", () => {
+            fetchUserDetails("user");
+        });
+
+        async function deleteAddress(username, addressIndex) {
+            const response = await fetch(`http://127.0.0.1:8000/users/${username}/del_address?address_index=${addressIndex}`, {
+                method: "DELETE"});
+            const result = await response.json();
+            if (result === "OK") {
+                alert("Address deleted successfully.");
+                fetchUserDetails(username);
+            } else {
+                alert("Failed to delete address.");
+            }
+        }
+
+        document.getElementById("delete-address-button").addEventListener("click", () => {
+            const username = "user";
+            const addressIndex = parseInt(document.getElementById("address-index").value);
+            deleteAddress(username, addressIndex);
+        });
+    </script>
+</body>
+</html>

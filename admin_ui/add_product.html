@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+    
+        h1 {
+            background-color: #ffb3a6;
+            padding: 20px;
+            margin: 0;
+            color: #fff;
+            text-align: center;
+        }
+    
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+    
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+    
+        input, select {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            height: 40px;
+        }
+    
+        textarea {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            min-height: 100px;
+        }
+    
+        button {
+            background-color: #ffb3a6;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    
+        button:hover {
+            background-color: #ff857f;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <h1>Add Product</h1>
+    <form id="add-product-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required>
+        <br>
+
+        <label for="price">Price:</label>
+        <input type="number" id="price" required>
+        <br>
+
+        <label for="specify">Specify:</label>
+        <input type="text" id="specify" required>
+        <br>
+
+        <label for="stock">Stock:</label>
+        <input type="number" id="stock" required>
+        <br>
+
+        <label for="description">Description:</label>
+        <input type="text" id="description" required>
+        <br>
+
+        <label for="detail">Detail:</label>
+        <input type="text" id="detail" required>
+        <br>
+
+        <label for="p_type">Product Type:</label>
+        <input type="text" id="p_type" required>
+        <br>
+
+        <button type="submit">Add Product</button>
+    </form>
+
+    <h2>Optional: Select Existing Product</h2>
+    <select id="existing-products">
+        <option value="">--Select a product--</option>
+    </select>
+
+    <script>
+        async function fetchProducts() {
+            const response = await fetch("http://127.0.0.1:8000/admin/products");
+            const products = await response.json();
+            return products;
+        }
+
+        async function addProduct(product) {
+            const response = await fetch("http://127.0.0.1:8000/admin/add_product", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(product)
+            });
+            const result = await response.text();
+            if (result != "KO")
+                return true;
+            return false;
+        }
+
+        async function init() {
+            const products = await fetchProducts();
+            const selectElement = document.getElementById("existing-products");
+
+            for (const product of products) {
+                const option = document.createElement("option");
+                option.value = product.id;
+                option.innerText = product.name;
+                selectElement.appendChild(option);
+            }
+
+            selectElement.onchange = () => {
+                const selectedProduct = products.find(p => p.id === selectElement.value);
+                if (selectedProduct) {
+                    document.getElementById("name").value = selectedProduct.name;
+                    document.getElementById("price").value = selectedProduct.price;
+                    document.getElementById("specify").value = selectedProduct.specify;
+                    document.getElementById("stock").value = selectedProduct.stock;
+                    document.getElementById("description").value = selectedProduct.description;
+                    document.getElementById("detail").value = selectedProduct.detail;
+                    document.getElementById("p_type").value = selectedProduct.type.join(",");
+                }
+            };
+
+            const form = document.getElementById("add-product-form");
+            form.onsubmit = async (event) => {
+                event.preventDefault();
+
+                const product = {
+                    name: document.getElementById("name").value,
+                    price: parseInt(document.getElementById("price").value),
+                    specify: document.getElementById("specify").value,
+                    stock: parseInt(document.getElementById("stock").value),
+                    description: document.getElementById("description").value,
+                    detail: document.getElementById("detail").value,
+                    p_type: document.getElementById("p_type").value
+                };
+
+                const isSuccess = await addProduct(product);
+                if (isSuccess) {
+                    alert("Product added successfully!");
+                    form.reset();
+                    selectElement.value = "";
+                } else {
+                    alert("Failed to add the product.");
+                }
+            };
+        }
+
+        init();
+    </script>
+</body>
+</html>
+

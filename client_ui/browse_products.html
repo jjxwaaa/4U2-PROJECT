@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Products</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        li {
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px;
+            cursor: pointer;
+            flex-basis: calc(25% - 20px);
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        li:hover {
+            background-color: #ddd;
+        }
+
+        img.product-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #4CAF50;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Browse Products</h1>
+	<!-- <input placeholder="search production" type="text" value="search" onchange="(e) => {e.target.value}" /> -->
+    <div class="nav-bar">
+		<a class="nav-link" href="confirm_payment.html">Confirm Payment</a>
+        <a class="nav-link" href="user_info.html">User Info</a>
+        <a class="nav-link" href="view_cart.html">View Cart</a>
+        <a class="nav-link" href="view_order.html">View Orders</a>
+    </div>
+    <div>
+        <label for="product-type-filter">Filter by type:</label>
+        <select id="product-type-filter">
+            <option value="">All</option>
+            <option value="Lips">Lips</option>
+            <option value="keyboard">Keyboard</option>
+            <option value="gadget">Gadget</option>
+        </select>
+    </div>
+    <ul id="products-list"></ul>
+
+    <script>
+        async function fetchProducts() {
+            const response = await fetch("http://127.0.0.1:8000/Products");
+            const products = await response.json();
+            return products;
+        }
+
+        function createProductItem(product) {
+            const li = document.createElement("li");
+            li.innerHTML = `
+                <img class="product-image" src="https://f4.bcbits.com/img/a3005217838_10.jpg" alt="${product.name}">
+                <h3>${product.name}</h3>
+            `;
+
+            li.onclick = () => {
+                window.location.href = `view_product_detail.html?id=${product.id}`;
+            };
+
+            return li;
+        }
+
+        function displayProducts(products, filterType) {
+            const productsList = document.getElementById("products-list");
+            productsList.innerHTML = "";
+
+            for (const product of products) {
+                if (!filterType || product.type.includes(filterType)) {
+                    const productItem = createProductItem(product);
+                    productsList.appendChild(productItem);
+                }
+            }
+        }
+
+        async function init() {
+            const products = await fetchProducts();
+            displayProducts(products);
+
+            document.getElementById("product-type-filter").addEventListener("change", (event) => {
+                displayProducts(products, event.target.value);
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

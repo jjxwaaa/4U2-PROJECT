@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Display</title>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .product-title {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .product-price {
+            font-size: 1.5em;
+            color: #f44336;
+            margin-bottom: 10px;
+        }
+        .specify {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="product-title" id="name"></h1>
+        <p class="product-price" id="price"></p>
+        <p id="description"></p>
+        <p id="detail"></p>
+        <div class="specify" id="specify"></div>
+		<img src="https://image.makewebeasy.net/makeweb/r_409x409/pyuHEt3NP/SEW/SEW.jpg?v=202012190947" alt="img">
+		<button>AddToCart</button>
+    </div>
+    <script>
+		    function displayProductData(product) {
+        document.getElementById('name').innerText = product.name;
+        document.getElementById('price').innerText = `$${product.price}`;
+        document.getElementById('description').innerText = product.description;
+        document.getElementById('detail').innerText = product.detail.replace(/\\n/g, '\n');
+        
+        const specifyDiv = document.getElementById('specify');
+        for (const key in product.specify) {
+            const item = document.createElement('div');
+            item.innerText = `${key}: ${product.specify[key]}`;
+            specifyDiv.appendChild(item);
+        }
+    }
+
+    getProductData();
+
+        async function getProductData() {
+			const product_id = "4"; // Replace with desired product_id
+            const response = await fetch(`http://127.0.0.1:8000/Products/${product_id}`);
+            const data = await response.json();
+            displayProductData(data);
+        }
+		</script>
+	</body>
+</html>

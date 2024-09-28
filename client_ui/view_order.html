@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Order</title>
+</head>
+<body>
+    <h1>View Order</h1>
+    <form id="view-order-form">
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+        <br>
+        <label for="order-id">Order ID:</label>
+        <input type="text" id="order-id" required>
+        <br>
+        <button type="submit">View Order</button>
+    </form>
+    <div id="order-details" style="display: none;">
+        <h2>Order Details</h2>
+        <p>Order ID: <span id="display-order-id"></span></p>
+        <p>Created: <span id="display-order-date"></span></p>
+        <p>Payment Status: <span id="display-payment-status"></span></p>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Product Name</th>
+                    <th>Product Price</th>
+                    <th>Discount</th>
+                    <th>Price After Discount</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                </tr>
+            </thead>
+            <tbody id="order-items"></tbody>
+        </table>
+        <p>Total: <span id="display-total"></span></p>
+    </div>
+
+    <script>
+        document.getElementById("view-order-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const email = document.getElementById("email").value;
+            const orderId = document.getElementById("order-id").value;
+
+            const response = await fetch(`http://127.0.0.1:8000/feat/orders?email=${email}&order_id=${orderId}`);
+
+            const result = await response.json();
+
+
+            if (result !== "KO") {
+                document.getElementById("display-order-id").innerText = result.id;
+                document.getElementById("display-order-date").innerText = result.create;
+                document.getElementById("display-payment-status").innerText = result.payment_status;
+
+                const items = result.items;
+                const orderItems = document.getElementById("order-items");
+
+                for (const itemId in items) {
+                    const item = items[itemId];
+					console.log(item)	
+                    // for (const subItemId in item) {
+                    //     const subItem = item[subItemId];
+                        const tr = document.createElement("tr");
+
+                        // tr.innerHTML = `
+                        //     <td>${subItemId}</td>
+                        //     <td>${subItem.product_name}</td>
+                        //     <td>${subItem.product_price}</td>
+                        //     <td>${subItem.discount}</td>
+                        //     <td>${subItem.price_after_discount}</td>
+                        //     <td>${subItem.quantity}</td>
+                        //     <td>${subItem.price}</td>
+                        // `;
+
+					    tr.innerHTML = `
+                            <td>${item.id}</td>
+                            <td>${item.product_name}</td>
+                            <td>${item.product_price}</td>
+                            <td>${item.discount}</td>
+                            <td>${item.price_after_discount}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.price}</td>
+                        `
+
+                        orderItems.appendChild(tr);
+                    // }
+                }
+
+                document.getElementById("display-total").innerText = result.total;
+                document.getElementById("order-details").style.display = "block";
+            } else {
+                alert("Failed to fetch order details.");
+            }
+        });
+    </script>
+</body>
+</html>

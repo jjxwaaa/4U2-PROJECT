@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 300px;
+            padding: 16px;
+            background-color: white;
+            margin: 100px auto;
+            border: 1px solid black;
+            box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        input[type=text], input[type=password] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #ffb3a6;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+	<s>
+    <div class="container">
+		<h1> ADMIN LOGIN </h1>
+        <label for="uname"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="uname" id="uname" required>
+
+        <label for="psw"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+
+        <button onclick="submitLogin()" type="submit">Login</button>
+    </div>
+    <script>
+        async function submitLogin() {
+            const username = document.getElementById('uname').value;
+            const password = document.getElementById('psw').value;
+
+            const response = await fetch(`http://127.0.0.1:8000/admin/login`,{
+			method: "POST", // or 'PUT'
+      		headers: {
+        		"Content-Type": "application/json"},
+      		body: JSON.stringify({"username":username, "password":password})
+    	});
+
+		JSON_DATA = await response.json()
+		console.log(JSON_DATA);
+		if (JSON_DATA != 'KO') {
+			alert("pass")
+			window.location = 'home_page.html';
+		}else {
+			alert("failed")
+		}
+		}
+
+    </script>
+</body>
+</html>
